@@ -4,6 +4,7 @@
 .data
 .cache
 dist
+.vercel
 
 # Node
 node_modules
