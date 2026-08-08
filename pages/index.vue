@@ -156,7 +156,31 @@
           </li>
         </ul>
 
-        <div class="anim-rise mt-10 flex flex-wrap gap-3" style="animation-delay: 0.75s">
+        <div
+          v-if="result.careers.length"
+          class="anim-rise mt-9 pt-8 border-t border-[rgba(31,122,99,0.18)]"
+          style="animation-delay: 0.72s"
+        >
+          <p class="text-sm tracking-[0.18em] text-[var(--ink-soft)]">
+            適職の例
+          </p>
+          <ul class="mt-4 flex flex-wrap items-baseline gap-x-0 gap-y-2 text-base text-[var(--ink)]">
+            <li
+              v-for="(career, index) in result.careers"
+              :key="career"
+              class="inline-flex items-baseline"
+            >
+              <span
+                v-if="index > 0"
+                class="mx-2.5 text-[var(--seafoam)]"
+                aria-hidden="true"
+              >/</span>
+              <span>{{ career }}</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="anim-rise mt-10 flex flex-wrap gap-3" style="animation-delay: 0.8s">
           <a
             :href="shareUrl"
             target="_blank"
@@ -206,12 +230,20 @@ const siteUrl = computed(() => {
 const shareUrl = computed(() => {
   if (!result.value) return '#'
 
+  const careers =
+    result.value.careers.length > 0
+      ? `適職例: ${result.value.careers.slice(0, 3).join(' / ')}`
+      : ''
+
   const text = [
     `私のMBTIは「${result.value.code}（${result.value.name}）」でした！`,
+    careers,
     '',
     '4問でわかる Simple MBTI',
     '#SimpleMBTI #MBTI'
-  ].join('\n')
+  ]
+    .filter(Boolean)
+    .join('\n')
 
   const params = new URLSearchParams({
     text,
