@@ -200,7 +200,7 @@ const currentQuestion = computed(() => questions[currentIndex.value] ?? null)
 
 const siteUrl = computed(() => {
   if (import.meta.client) return window.location.href
-  return 'https://simple-mbti.vercel.app'
+  return 'https://simple-mbti-self.vercel.app'
 })
 
 const shareUrl = computed(() => {
