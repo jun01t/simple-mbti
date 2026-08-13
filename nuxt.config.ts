@@ -1,7 +1,7 @@
 const siteUrl = 'https://simple-mbti-self.vercel.app'
-const siteTitle = 'Simple MBTI — 4問でわかる性格診断'
+const siteTitle = 'Simple Type — 4問でわかる16タイプ性格診断'
 const siteDescription =
-  '4つの質問に答えるだけで、あなたのMBTIタイプと適職の傾向がわかるシンプルな性格診断サイトです。'
+  '4つの質問に答えるだけで、16タイプの傾向と適職のヒントがわかる娯楽用の簡易性格診断です。公式の性格検査ではありません。'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -27,7 +27,7 @@ export default defineNuxtConfig({
         { property: 'og:title', content: siteTitle },
         { property: 'og:description', content: siteDescription },
         { property: 'og:locale', content: 'ja_JP' },
-        { property: 'og:site_name', content: 'Simple MBTI' },
+        { property: 'og:site_name', content: 'Simple Type' },
         { name: 'twitter:card', content: 'summary' },
         { name: 'twitter:title', content: siteTitle },
         { name: 'twitter:description', content: siteDescription }

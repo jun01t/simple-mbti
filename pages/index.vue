@@ -30,19 +30,19 @@
           id="hero-brand"
           class="anim-rise font-display text-[clamp(2.75rem,10vw,4.5rem)] leading-none tracking-tight text-[#f7faf8]"
         >
-          Simple MBTI
+          Simple Type
         </h1>
         <p
           class="anim-rise mt-5 text-[clamp(1.35rem,4.2vw,1.85rem)] font-medium text-[#e8f4f2] leading-snug"
           style="animation-delay: 0.12s"
         >
-          4問に答えるだけで、あなたのタイプがわかる
+          4問に答えるだけで、16タイプの傾向がわかる
         </p>
         <p
           class="anim-rise mt-3 text-[#c5ddd4] text-base sm:text-lg leading-relaxed max-w-md mx-auto sm:mx-0"
           style="animation-delay: 0.22s"
         >
-          E/I・S/N・T/F・J/P、各1問ずつ。適職のヒントまでわかるかんたん性格診断。
+          E/I・S/N・T/F・J/P、各1問ずつの娯楽用かんたん診断。適職のヒントつき。
         </p>
         <div class="anim-rise mt-9" style="animation-delay: 0.34s">
           <button
@@ -54,6 +54,12 @@
             診断をはじめる
           </button>
         </div>
+        <p
+          class="anim-rise mt-8 text-xs leading-relaxed text-[#c5ddd4]/80 max-w-md mx-auto sm:mx-0"
+          style="animation-delay: 0.42s"
+        >
+          公式の MBTI® 診断ではありません。娯楽目的の独自簡易診断です。
+        </p>
       </div>
     </section>
 
@@ -66,7 +72,7 @@
       <div class="w-full max-w-xl mx-auto">
         <div class="flex items-end justify-between gap-4 mb-6">
           <p class="font-display text-2xl sm:text-3xl text-[var(--teal)] tracking-tight">
-            Simple MBTI
+            Simple Type
           </p>
           <p class="text-sm text-[var(--ink-soft)] tabular-nums" aria-live="polite">
             {{ currentIndex + 1 }} / {{ questions.length }}
@@ -145,13 +151,13 @@
     >
       <div class="w-full max-w-xl mx-auto anim-fade">
         <p class="font-display text-xl sm:text-2xl text-[var(--teal)] tracking-tight">
-          Simple MBTI
+          Simple Type
         </p>
         <p class="mt-8 text-sm tracking-[0.2em] uppercase text-[var(--ink-soft)]">
           あなたのタイプ
         </p>
 
-        <div class="mt-3 flex flex-wrap gap-1 sm:gap-2" aria-label="MBTIタイプ">
+        <div class="mt-3 flex flex-wrap gap-1 sm:gap-2" aria-label="16タイプの結果コード">
           <span
             v-for="(letter, index) in result.code.split('')"
             :key="`${letter}-${index}`"
@@ -216,7 +222,7 @@
           style="animation-delay: 0.74s"
         >
           <p class="text-sm tracking-[0.18em] text-[var(--ink-soft)]">
-            適職の例
+            適職の例（参考）
           </p>
           <ul class="mt-4 flex flex-wrap items-baseline gap-x-0 gap-y-2 text-base text-[var(--ink)]">
             <li
@@ -262,9 +268,17 @@
           </button>
         </div>
 
-        <p class="mt-12 text-xs leading-relaxed text-[var(--ink-soft)]/80 max-w-sm">
-          ※ 本診断は娯楽目的の簡易版です。正式な性格検査ではありません。
-        </p>
+        <div class="mt-12 space-y-3 text-xs leading-relaxed text-[var(--ink-soft)]/80 max-w-lg">
+          <p>
+            ※ 本サイトは娯楽目的の独自簡易診断です。心理学的検査・職業適性検査・正式な性格検査ではありません。
+          </p>
+          <p>
+            ※ 公式の MBTI® 診断ではありません。MBTI® および Myers-Briggs Type Indicator® は The Myers-Briggs Company の登録商標です。本サービスは同社と提携・認定されていません。
+          </p>
+          <p>
+            ※ 適職は一般的な傾向の参考情報であり、就職・転職・進路の助言ではありません。
+          </p>
+        </div>
       </div>
     </section>
   </div>
@@ -278,7 +292,7 @@ import {
   diagnose,
   questions,
   type Trait,
-  type MbtiTypeInfo
+  type TypeInfo
 } from '~/utils/mbti'
 
 type Step = 'start' | 'quiz' | 'result'
@@ -288,7 +302,7 @@ const SITE_URL = 'https://simple-mbti-self.vercel.app'
 const step = ref<Step>('start')
 const currentIndex = ref(0)
 const answers = ref<Trait[]>([])
-const result = ref<MbtiTypeInfo | null>(null)
+const result = ref<TypeInfo | null>(null)
 const copied = ref(false)
 const questionTitle = ref<HTMLElement | null>(null)
 const resultTitle = ref<HTMLElement | null>(null)
@@ -313,11 +327,11 @@ const shareText = computed(() => {
       : ''
 
   return [
-    `私のMBTIは「${result.value.code}（${result.value.name}）」でした！`,
+    `私のタイプは「${result.value.code}（${result.value.name}）」でした！`,
     careers,
     '',
-    '4問でわかる Simple MBTI',
-    '#SimpleMBTI #MBTI'
+    '4問でわかる Simple Type（娯楽用16タイプ診断）',
+    '#SimpleType #16タイプ'
   ]
     .filter(Boolean)
     .join('\n')
