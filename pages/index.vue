@@ -4,6 +4,7 @@
     <section
       v-if="step === 'start'"
       class="relative flex-1 flex flex-col justify-end sm:justify-center min-h-screen overflow-hidden"
+      aria-labelledby="hero-brand"
     >
       <div class="absolute inset-0 hero-visual" aria-hidden="true">
         <div class="hero-sky" />
@@ -25,25 +26,29 @@
       </div>
 
       <div class="relative z-10 px-6 pb-14 pt-24 sm:px-10 sm:pb-20 max-w-2xl mx-auto w-full text-center sm:text-left">
-        <p class="anim-rise font-display text-[clamp(2.75rem,10vw,4.5rem)] leading-none tracking-tight text-[#f7faf8]">
-          Simple MBTI
-        </p>
         <h1
+          id="hero-brand"
+          class="anim-rise font-display text-[clamp(2.75rem,10vw,4.5rem)] leading-none tracking-tight text-[#f7faf8]"
+        >
+          Simple MBTI
+        </h1>
+        <p
           class="anim-rise mt-5 text-[clamp(1.35rem,4.2vw,1.85rem)] font-medium text-[#e8f4f2] leading-snug"
           style="animation-delay: 0.12s"
         >
           4問に答えるだけで、あなたのタイプがわかる
-        </h1>
+        </p>
         <p
           class="anim-rise mt-3 text-[#c5ddd4] text-base sm:text-lg leading-relaxed max-w-md mx-auto sm:mx-0"
           style="animation-delay: 0.22s"
         >
-          E/I・S/N・T/F・J/P、各1問ずつのかんたん性格診断。
+          E/I・S/N・T/F・J/P、各1問ずつ。適職のヒントまでわかるかんたん性格診断。
         </p>
         <div class="anim-rise mt-9" style="animation-delay: 0.34s">
           <button
+            ref="startButton"
             type="button"
-            class="inline-flex items-center justify-center min-h-12 px-8 text-base font-medium text-[#1a2e28] bg-[#d8f3e7] hover:bg-white transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d8f3e7]"
+            class="inline-flex items-center justify-center min-h-12 px-8 text-base font-medium text-[#1a2e28] bg-[#d8f3e7] hover:bg-white active:translate-y-px transition-[color,background-color,transform] duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d8f3e7]"
             @click="startQuiz"
           >
             診断をはじめる
@@ -56,23 +61,25 @@
     <section
       v-else-if="step === 'quiz' && currentQuestion"
       class="flex-1 flex flex-col justify-center px-5 py-12 sm:px-8"
+      aria-labelledby="question-title"
     >
       <div class="w-full max-w-xl mx-auto">
         <div class="flex items-end justify-between gap-4 mb-6">
           <p class="font-display text-2xl sm:text-3xl text-[var(--teal)] tracking-tight">
             Simple MBTI
           </p>
-          <p class="text-sm text-[var(--ink-soft)] tabular-nums">
+          <p class="text-sm text-[var(--ink-soft)] tabular-nums" aria-live="polite">
             {{ currentIndex + 1 }} / {{ questions.length }}
           </p>
         </div>
 
         <div
-          class="h-1 w-full bg-[rgba(31,122,99,0.15)] overflow-hidden mb-10"
+          class="h-1 w-full bg-[rgba(31,122,99,0.15)] overflow-hidden mb-8"
           role="progressbar"
           :aria-valuenow="currentIndex + 1"
           aria-valuemin="1"
           :aria-valuemax="questions.length"
+          :aria-label="`質問 ${currentIndex + 1} / ${questions.length}`"
         >
           <div
             class="h-full origin-left bg-[var(--teal)] transition-[width] duration-500 ease-out"
@@ -81,16 +88,24 @@
         </div>
 
         <div :key="currentQuestion.id" class="anim-rise">
-          <h2 class="font-display text-[clamp(1.4rem,4vw,1.85rem)] leading-snug text-[var(--ink)]">
+          <p class="text-sm tracking-[0.16em] text-[var(--teal)] mb-3">
+            {{ axisMeta[currentQuestion.axis].label }}
+          </p>
+          <h2
+            id="question-title"
+            ref="questionTitle"
+            tabindex="-1"
+            class="font-display text-[clamp(1.4rem,4vw,1.85rem)] leading-snug text-[var(--ink)] outline-none"
+          >
             {{ currentQuestion.text }}
           </h2>
 
-          <div class="mt-8 flex flex-col gap-3">
+          <div class="mt-8 flex flex-col gap-3" role="group" :aria-labelledby="'question-title'">
             <button
               v-for="(option, optionIndex) in currentQuestion.options"
               :key="option.trait"
               type="button"
-              class="group text-left w-full min-h-[4.5rem] px-5 py-4 border border-[rgba(31,122,99,0.28)] bg-[rgba(247,250,248,0.72)] backdrop-blur-sm hover:border-[var(--teal)] hover:bg-[rgba(216,243,231,0.85)] transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--teal)]"
+              class="group text-left w-full min-h-[4.5rem] px-5 py-4 border border-[rgba(31,122,99,0.28)] bg-[rgba(247,250,248,0.72)] backdrop-blur-sm hover:border-[var(--teal)] hover:bg-[rgba(216,243,231,0.85)] active:bg-[rgba(216,243,231,0.95)] transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--teal)]"
               @click="selectAnswer(option.trait)"
             >
               <span class="block text-xs tracking-widest text-[var(--teal)] mb-1.5">
@@ -101,6 +116,23 @@
               </span>
             </button>
           </div>
+
+          <div class="mt-8 flex items-center justify-between gap-3">
+            <button
+              v-if="currentIndex > 0"
+              type="button"
+              class="text-sm text-[var(--ink-soft)] hover:text-[var(--teal)] transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--teal)]"
+              @click="goBack"
+            >
+              ← 前の質問に戻る
+            </button>
+            <p v-else class="text-sm text-[var(--ink-soft)]/70">
+              近いほうを選んでください
+            </p>
+            <p class="text-xs text-[var(--ink-soft)]/60 hidden sm:block">
+              A / B キーでも回答可
+            </p>
+          </div>
         </div>
       </div>
     </section>
@@ -109,6 +141,7 @@
     <section
       v-else-if="step === 'result' && result"
       class="flex-1 flex flex-col justify-center px-5 py-14 sm:px-8"
+      aria-labelledby="result-type"
     >
       <div class="w-full max-w-xl mx-auto anim-fade">
         <p class="font-display text-xl sm:text-2xl text-[var(--teal)] tracking-tight">
@@ -130,7 +163,10 @@
         </div>
 
         <h2
-          class="anim-rise mt-4 text-2xl sm:text-3xl font-medium text-[var(--teal)]"
+          id="result-type"
+          ref="resultTitle"
+          tabindex="-1"
+          class="anim-rise mt-4 text-2xl sm:text-3xl font-medium text-[var(--teal)] outline-none"
           style="animation-delay: 0.45s"
         >
           {{ result.name }}
@@ -143,9 +179,27 @@
         </p>
 
         <ul
+          v-if="breakdown.length"
+          class="anim-rise mt-8 grid grid-cols-2 gap-x-4 gap-y-3"
+          style="animation-delay: 0.62s"
+        >
+          <li
+            v-for="item in breakdown"
+            :key="item.axis"
+            class="min-w-0"
+          >
+            <p class="text-xs tracking-wider text-[var(--ink-soft)]">{{ item.label }}</p>
+            <p class="mt-1 text-sm sm:text-base text-[var(--ink)]">
+              <span class="font-display text-lg text-[var(--teal)] mr-1.5">{{ item.trait }}</span>
+              {{ item.traitName }}
+            </p>
+          </li>
+        </ul>
+
+        <ul
           v-if="result.traits.length"
           class="anim-rise mt-8 flex flex-wrap gap-x-5 gap-y-2"
-          style="animation-delay: 0.65s"
+          style="animation-delay: 0.68s"
         >
           <li
             v-for="trait in result.traits"
@@ -159,7 +213,7 @@
         <div
           v-if="result.careers.length"
           class="anim-rise mt-9 pt-8 border-t border-[rgba(31,122,99,0.18)]"
-          style="animation-delay: 0.72s"
+          style="animation-delay: 0.74s"
         >
           <p class="text-sm tracking-[0.18em] text-[var(--ink-soft)]">
             適職の例
@@ -180,12 +234,12 @@
           </ul>
         </div>
 
-        <div class="anim-rise mt-10 flex flex-wrap gap-3" style="animation-delay: 0.8s">
+        <div class="anim-rise mt-10 flex flex-wrap gap-3" style="animation-delay: 0.82s">
           <a
             :href="shareUrl"
             target="_blank"
             rel="noopener noreferrer"
-            class="inline-flex items-center justify-center gap-2 min-h-12 px-7 text-base font-medium text-white bg-[#111] hover:bg-[#333] transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#111]"
+            class="inline-flex items-center justify-center gap-2 min-h-12 px-7 text-base font-medium text-white bg-[#111] hover:bg-[#333] active:translate-y-px transition-[color,background-color,transform] duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#111]"
           >
             <svg class="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
               <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.727-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z" />
@@ -194,7 +248,14 @@
           </a>
           <button
             type="button"
-            class="inline-flex items-center justify-center min-h-12 px-7 text-base font-medium text-[var(--teal)] border border-[var(--teal)] bg-transparent hover:bg-[rgba(216,243,231,0.55)] transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--teal)]"
+            class="inline-flex items-center justify-center min-h-12 px-7 text-base font-medium text-[var(--ink)] border border-[rgba(31,122,99,0.35)] bg-[rgba(247,250,248,0.65)] hover:border-[var(--teal)] hover:bg-[rgba(216,243,231,0.55)] active:translate-y-px transition-[color,background-color,border-color,transform] duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--teal)]"
+            @click="copyResult"
+          >
+            {{ copied ? 'コピーしました' : '結果をコピー' }}
+          </button>
+          <button
+            type="button"
+            class="inline-flex items-center justify-center min-h-12 px-7 text-base font-medium text-[var(--teal)] border border-[var(--teal)] bg-transparent hover:bg-[rgba(216,243,231,0.55)] active:translate-y-px transition-[color,background-color,transform] duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--teal)]"
             @click="restart"
           >
             もう一度診断する
@@ -210,32 +271,48 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { diagnose, questions, type Trait, type MbtiTypeInfo } from '~/utils/mbti'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import {
+  axisBreakdown,
+  axisMeta,
+  diagnose,
+  questions,
+  type Trait,
+  type MbtiTypeInfo
+} from '~/utils/mbti'
 
 type Step = 'start' | 'quiz' | 'result'
+
+const SITE_URL = 'https://simple-mbti-self.vercel.app'
 
 const step = ref<Step>('start')
 const currentIndex = ref(0)
 const answers = ref<Trait[]>([])
 const result = ref<MbtiTypeInfo | null>(null)
+const copied = ref(false)
+const questionTitle = ref<HTMLElement | null>(null)
+const resultTitle = ref<HTMLElement | null>(null)
+const startButton = ref<HTMLButtonElement | null>(null)
+
+let copiedTimer: ReturnType<typeof setTimeout> | null = null
 
 const currentQuestion = computed(() => questions[currentIndex.value] ?? null)
+const breakdown = computed(() => (result.value ? axisBreakdown(result.value.code) : []))
 
 const siteUrl = computed(() => {
-  if (import.meta.client) return window.location.href
-  return 'https://simple-mbti-self.vercel.app'
+  if (import.meta.client) return `${window.location.origin}/`
+  return `${SITE_URL}/`
 })
 
-const shareUrl = computed(() => {
-  if (!result.value) return '#'
+const shareText = computed(() => {
+  if (!result.value) return ''
 
   const careers =
     result.value.careers.length > 0
       ? `適職例: ${result.value.careers.slice(0, 3).join(' / ')}`
       : ''
 
-  const text = [
+  return [
     `私のMBTIは「${result.value.code}（${result.value.name}）」でした！`,
     careers,
     '',
@@ -244,20 +321,37 @@ const shareUrl = computed(() => {
   ]
     .filter(Boolean)
     .join('\n')
+})
+
+const shareUrl = computed(() => {
+  if (!result.value) return '#'
 
   const params = new URLSearchParams({
-    text,
+    text: shareText.value,
     url: siteUrl.value
   })
 
   return `https://x.com/intent/tweet?${params.toString()}`
 })
 
+const focusStepTarget = async () => {
+  await nextTick()
+  if (step.value === 'quiz') {
+    questionTitle.value?.focus({ preventScroll: true })
+  } else if (step.value === 'result') {
+    resultTitle.value?.focus({ preventScroll: true })
+  } else {
+    startButton.value?.focus({ preventScroll: true })
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
 const startQuiz = () => {
   step.value = 'quiz'
   currentIndex.value = 0
   answers.value = []
   result.value = null
+  copied.value = false
 }
 
 const selectAnswer = (trait: Trait) => {
@@ -272,12 +366,77 @@ const selectAnswer = (trait: Trait) => {
   step.value = 'result'
 }
 
+const goBack = () => {
+  if (currentIndex.value <= 0) return
+  currentIndex.value -= 1
+}
+
 const restart = () => {
   step.value = 'start'
   currentIndex.value = 0
   answers.value = []
   result.value = null
+  copied.value = false
 }
+
+const copyResult = async () => {
+  if (!result.value || !import.meta.client) return
+
+  const text = `${shareText.value}\n${siteUrl.value}`
+
+  try {
+    await navigator.clipboard.writeText(text)
+  } catch {
+    const textarea = document.createElement('textarea')
+    textarea.value = text
+    textarea.setAttribute('readonly', '')
+    textarea.style.position = 'fixed'
+    textarea.style.opacity = '0'
+    document.body.appendChild(textarea)
+    textarea.select()
+    document.execCommand('copy')
+    document.body.removeChild(textarea)
+  }
+
+  copied.value = true
+  if (copiedTimer) clearTimeout(copiedTimer)
+  copiedTimer = setTimeout(() => {
+    copied.value = false
+  }, 2000)
+}
+
+const onKeydown = (event: KeyboardEvent) => {
+  if (step.value !== 'quiz' || !currentQuestion.value) return
+  if (event.metaKey || event.ctrlKey || event.altKey) return
+
+  const target = event.target as HTMLElement | null
+  if (target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)) return
+
+  const key = event.key.toLowerCase()
+  if (key === 'a' || key === '1') {
+    event.preventDefault()
+    selectAnswer(currentQuestion.value.options[0].trait)
+  } else if (key === 'b' || key === '2') {
+    event.preventDefault()
+    selectAnswer(currentQuestion.value.options[1].trait)
+  } else if (key === 'backspace' && currentIndex.value > 0) {
+    event.preventDefault()
+    goBack()
+  }
+}
+
+watch([step, currentIndex], () => {
+  focusStepTarget()
+})
+
+onMounted(() => {
+  window.addEventListener('keydown', onKeydown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', onKeydown)
+  if (copiedTimer) clearTimeout(copiedTimer)
+})
 </script>
 
 <style scoped>

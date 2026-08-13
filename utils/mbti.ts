@@ -173,6 +173,16 @@ export const typeInfo: Record<string, MbtiTypeInfo> = {
   }
 }
 
+export const axisMeta: Record<
+  Dichotomy,
+  { label: string; left: Trait; right: Trait; leftName: string; rightName: string }
+> = {
+  EI: { label: 'エネルギーの向き', left: 'E', right: 'I', leftName: '外向', rightName: '内向' },
+  SN: { label: '情報の取り方', left: 'S', right: 'N', leftName: '感覚', rightName: '直感' },
+  TF: { label: '判断の基準', left: 'T', right: 'F', leftName: '思考', rightName: '感情' },
+  JP: { label: '進め方の好み', left: 'J', right: 'P', leftName: '判断', rightName: '知覚' }
+}
+
 export function diagnose(answers: Trait[]): MbtiTypeInfo {
   const code = answers.join('')
   return (
@@ -184,4 +194,22 @@ export function diagnose(answers: Trait[]): MbtiTypeInfo {
       careers: []
     }
   )
+}
+
+export function axisBreakdown(code: string) {
+  const letters = code.split('') as Trait[]
+  const axes: Dichotomy[] = ['EI', 'SN', 'TF', 'JP']
+
+  return axes.map((axis, index) => {
+    const meta = axisMeta[axis]
+    const trait = letters[index]
+    const isLeft = trait === meta.left
+
+    return {
+      axis,
+      label: meta.label,
+      trait: trait ?? meta.left,
+      traitName: isLeft ? meta.leftName : meta.rightName
+    }
+  })
 }

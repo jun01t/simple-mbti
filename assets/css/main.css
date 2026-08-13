@@ -98,3 +98,24 @@ body::before {
 .anim-letter {
   animation: letter-pop 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .anim-rise,
+  .anim-fade,
+  .anim-letter,
+  .hero-sky,
+  .hero-glow,
+  .hero-ridges {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
